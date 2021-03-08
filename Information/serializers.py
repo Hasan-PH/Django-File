@@ -5,7 +5,8 @@ import datetime
 from django.utils.timezone import utc
 from datetime import datetime
 import os
-
+from os.path import dirname as up
+import pathlib
 
 class UserDocumentsSerializer(serializers.ModelSerializer):
     class Meta():
@@ -29,10 +30,15 @@ class UserDocumentsSerializer(serializers.ModelSerializer):
         # return UserDocuments.objects.create(doc_name='debugging', doc=doc)
 
     def update(self, instance, validated_data):
-        print(" I am here!!!!!!!!!!")
         # obj = UserDocuments.objects.filter(id=validated_data.get('id'))
         print(validated_data.get('doc'))
-        os.remove('cd ../..' + instance.doc_link)
         instance.doc = validated_data.get('doc')
+        instance.save()
+        instance.doc_name = str(instance.doc)
+        instance.doc_link = '/media/' + str(instance.doc)
+        if str(instance.doc).find('.') != -1:
+            instance.doc_type = str(instance.doc).split(".")[-1]
+        else:
+            instance.doc_type = ''
         instance.save()
         return instance
